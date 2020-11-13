@@ -63,6 +63,10 @@ impl EventHandler for MyGame {
             player.arena_bounds(arena_width, arena_height);
         }
 
+        if self.players[0].has_player_collision(&self.players[1]) {
+            println!("PLAYER COLLISION");
+        }
+
         // Update player's positional state when corresponding key is pressed.
         for &input in &[
             KeyCode::W,

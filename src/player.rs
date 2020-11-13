@@ -78,4 +78,17 @@ impl Player {
     pub fn right(&mut self) {
         self.location.x += PLAYER_MOVEMENT_SPEED;
     }
+
+    pub fn get_dimensions(&self) -> (f32, f32) {
+        (self.width, self.height)
+    }
+
+    pub fn has_player_collision(&self, player: &Player) -> bool {
+        let player_location: Point2<f32> = player.get_location();
+        let (player_width, player_height): (f32, f32) = player.get_dimensions();
+        return self.location.x < player_location.x + player_width &&
+            self.location.x + self.width > player_location.x &&
+            self.location.y < player_location.y + player_height &&
+            self.location.y + self.height > player_location.y
+    }
 }
