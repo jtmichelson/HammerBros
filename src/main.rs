@@ -3,6 +3,8 @@ mod player;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::event::{self, EventHandler, EventsLoop};
 use ggez::graphics::Color;
+use ggez::input::keyboard;
+use ggez::input::keyboard::KeyCode;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 
 use crate::player::Player;
@@ -53,16 +55,48 @@ impl MyGame {
 }
 
 impl EventHandler for MyGame {
-    fn update(&mut self, _context: &mut Context) -> GameResult<()> {
-        // Update code here...
+    fn update(&mut self, context: &mut Context) -> GameResult<()> {
+        let (arena_width, arena_height): (f32, f32) = graphics::drawable_size(context);
+
+        // Do not let the players move out of the window.
+        for player in self.players.iter_mut() {
+            player.arena_bounds(arena_width, arena_height);
+        }
+
+        // Update player's positional state when corresponding key is pressed.
+        for &input in &[
+            KeyCode::W,
+            KeyCode::S,
+            KeyCode::A,
+            KeyCode::D,
+            KeyCode::Up,
+            KeyCode::Down,
+            KeyCode::Left,
+            KeyCode::Right,
+        ] {
+            if keyboard::is_key_pressed(context, input) {
+                match input {
+                    KeyCode::W => self.players[0].up(),
+                    KeyCode::S => self.players[0].down(),
+                    KeyCode::A => self.players[0].left(),
+                    KeyCode::D => self.players[0].right(),
+                    KeyCode::Up => self.players[1].up(),
+                    KeyCode::Down => self.players[1].down(),
+                    KeyCode::Left => self.players[1].left(),
+                    KeyCode::Right => self.players[1].right(),
+                    _ => println!("Invalid key"),
+                }
+            }
+        }
+
         Ok(())
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult<()> {
         graphics::clear(context, GREY);
 
-        for i in 0..self.players.len() {
-            self.players[i].draw(context)?;
+        for player in self.players.iter() {
+            player.draw(context)?;
         }
 
         graphics::present(context)?;
